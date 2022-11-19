@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 ThemeData themeData = ThemeData(
     brightness: Brightness.dark,
-    primarySwatch: createMaterialColor(Color.fromRGBO(237, 106, 44, 1)));
+    primarySwatch: createMaterialColor(Color.fromRGBO(234, 91, 6, 1)));
 
 MaterialColor createMaterialColor(Color color) {
   List strengths = <double>[.05];
@@ -21,6 +21,6 @@ MaterialColor createMaterialColor(Color color) {
       1,
     );
   }
-  ;
+
   return MaterialColor(color.value, swatch);
 }

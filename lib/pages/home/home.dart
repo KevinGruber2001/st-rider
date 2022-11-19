@@ -12,6 +12,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rider/models/directions.model.dart';
 import 'package:rider/models/place.model.dart';
 import 'package:rider/pages/home/widgets/home_map.dart';
+import 'package:rider/pages/waiting/waiting.dart';
+import 'package:rider/repo/assignment_repo.dart';
 import 'package:rider/repo/directions_repo.dart';
 import 'package:rider/repo/place_repo.dart';
 
@@ -49,11 +51,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.local_activity),
-          onPressed: () {},
+        leading: Container(
+          height: 36,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: ImageIcon(
+              AssetImage("lib/assets/st-logo.png"),
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
         ),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.help))],
         title: const Text("Choose a location"),
       ),
       body: Column(children: [
@@ -128,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                   height: 10,
                 ),
                 ElevatedButton(
-                  onPressed: origin != null && destination != null
+                  onPressed: (origin != null) && (destination != null)
                       ? () async {
                           // Validate returns true if the form is valid, or false otherwise.
                           if (_formKey.currentState!.validate()) {
@@ -140,103 +148,18 @@ class _HomePageState extends State<HomePage> {
                                   .getDirections(
                                       origin!.position, destination!.position);
 
-                              print(directions);
-
-                              // REST API Get Request to get token
-                              var response = await http.get(Uri.parse(
-                                  'http://131.159.197.39/authenticate'));
-                              var token;
-                              if (response.statusCode == 200) {
-                                // If the server did return a 200 OK response,
-                                // then parse the JSON.
-                                token = jsonDecode(response.body);
-                                print(
-                                    "Statuscode Token Request ${response.statusCode}");
-                                print(token);
-                              } else {
-                                // If the server did not return a 200 OK response,
-                                // then throw an exception.
-                                throw Exception('Failed to load token');
-                              }
-
-                              // REST API PUT Response to send origin and destination
-                              var request = await http.post(
-                                Uri.parse(
-                                    'http://131.159.197.39/rider/registerRequest'),
-                                headers: <String, String>{
-                                  'Content-Type':
-                                      'application/json; charset=UTF-8',
-                                },
-                                body: jsonEncode(<String, dynamic>{
-                                  'token': token,
-                                  'begin': {
-                                    'longitude': origin?.position.longitude,
-                                    'latitude': origin?.position.latitude
-                                  },
-                                  'end': {
-                                    'longitude':
-                                        destination?.position.longitude,
-                                    'latitude': destination?.position.latitude
-                                  }
-                                }),
-                              );
-
-                              print(
-                                  "Statuscode Origin Destination Response ${request.statusCode}");
-
-                              // REST API GET Response Assignment
-                              var responseAssignment = await http.post(
-                                  Uri.parse(
-                                      'http://131.159.197.39/rider/fetchAssignment'),
-                                  headers: <String, String>{
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8'
-                                  },
-                                  body: jsonEncode(
-                                      <String, String>{'token': token}));
-                              var route;
-
-                              if (responseAssignment.statusCode == 200) {
-                                // If the server did return a 200 OK response,
-                                // then parse the JSON.
-                                route = jsonDecode(
-                                    responseAssignment.body)['route'];
-                                print(
-                                    "Statuscode Route Request ${responseAssignment.statusCode}");
-                                print(route);
-
-                                // If there is no route available wait and ask again
-                                while (route == null) {
-                                  Timer(Duration(seconds: 3), () async {
-                                    responseAssignment = await http.post(
-                                        Uri.parse(
-                                            'http://131.159.197.39/rider/fetchAssignment'),
-                                        headers: <String, String>{
-                                          'Content-Type':
-                                              'application/json; charset=UTF-8'
-                                        },
-                                        body: jsonEncode(
-                                            <String, String>{'token': token}));
-                                    if (responseAssignment.statusCode == 200) {
-                                      route = jsonDecode(
-                                          responseAssignment.body)['route'];
-                                      print(
-                                          "Statuscode Route Request ${responseAssignment.statusCode}");
-                                      print(route);
-                                    }
-                                  });
-                                }
-                              } else {
-                                // If the server did not return a 200 OK response,
-                                // then throw an exception.
-                                throw Exception('Failed to load Route');
-                              }
-
                               if (directions != null) {
                                 setState(() {
                                   route = directions;
                                 });
                               }
+
+                              //temporay located here
+                              AssignmentRepo().registerRequest(
+                                  origin!.position, destination!.position);
+
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const Waiting()));
                             }
                           }
                         }
