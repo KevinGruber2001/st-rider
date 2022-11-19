@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 // REST Api
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -16,6 +17,7 @@ import 'package:rider/pages/waiting/waiting.dart';
 import 'package:rider/repo/assignment_repo.dart';
 import 'package:rider/repo/directions_repo.dart';
 import 'package:rider/repo/place_repo.dart';
+import 'package:rider/utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -77,25 +79,30 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 TypeAheadField(
                   textFieldConfiguration: TextFieldConfiguration(
-                      decoration: InputDecoration(hintText: "Origin"),
+                      decoration: InputDecoration(hintText: "Start"),
                       controller: controllerOrigin),
                   suggestionsCallback: (pattern) async {
-                    List<Place> places = await PlacesRepo().getPlaces(pattern);
-                    return places;
+                    if (pattern != null || pattern != "") {
+                      List<Place> places =
+                          await PlacesRepo().getPlaces(pattern);
+                      return places;
+                    }
+                    return [];
                   },
                   itemBuilder: (context, places) {
                     return ListTile(
                       title: Text(places.name),
                     );
                   },
-                  onSuggestionSelected: (place) {
+                  onSuggestionSelected: (place) async {
+                    final Uint8List originIcon = await getBytesFromAsset(
+                        'lib/assets/origin-icon.png', 100);
                     controllerOrigin.value =
                         TextEditingValue().copyWith(text: place.name);
                     setState(() {
                       origin = Marker(
                         markerId: MarkerId("origin"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(
-                            BitmapDescriptor.hueOrange),
+                        icon: BitmapDescriptor.fromBytes(originIcon),
                         position: LatLng(
                             place.location.latitude, place.location.longitude),
                       );
@@ -108,24 +115,31 @@ class _HomePageState extends State<HomePage> {
                 TypeAheadField(
                   textFieldConfiguration: TextFieldConfiguration(
                       decoration: InputDecoration(hintText: "Destination"),
-                      controller: controllerDestination),
+                      controller: controllerDestination,
+                      enabled: origin == null ? false : true),
                   suggestionsCallback: (pattern) async {
-                    List<Place> places = await PlacesRepo().getPlaces(pattern);
-                    return places;
+                    if (pattern != null && pattern != "") {
+                      List<Place> places =
+                          await PlacesRepo().getPlaces(pattern);
+                      return places;
+                    }
+                    return [];
                   },
                   itemBuilder: (context, places) {
                     return ListTile(
                       title: Text(places.name),
                     );
                   },
-                  onSuggestionSelected: (place) {
+                  onSuggestionSelected: (place) async {
+                    final Uint8List flagMaker =
+                        await getBytesFromAsset('lib/assets/flag-icon.png', 80);
+
                     controllerDestination.value =
                         TextEditingValue().copyWith(text: place.name);
                     setState(() {
                       destination = Marker(
                         markerId: MarkerId("destination"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(
-                            BitmapDescriptor.hueOrange),
+                        icon: BitmapDescriptor.fromBytes(flagMaker),
                         position: LatLng(
                             place.location.latitude, place.location.longitude),
                       );
@@ -133,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 40,
                 ),
                 ElevatedButton(
                   onPressed: (origin != null) && (destination != null)
@@ -144,16 +158,6 @@ class _HomePageState extends State<HomePage> {
                             // you'd often call a server or save the information in a database.
 
                             if (origin != null && destination != null) {
-                              Directions? directions = await DirectionsRepo()
-                                  .getDirections(
-                                      origin!.position, destination!.position);
-
-                              if (directions != null) {
-                                setState(() {
-                                  route = directions;
-                                });
-                              }
-
                               //temporay located here
                               AssignmentRepo().registerRequest(
                                   origin!.position, destination!.position);
@@ -164,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                           }
                         }
                       : null,
-                  child: const Text('Calculate'),
+                  child: const Text('Request ride'),
                 ),
               ],
             ),

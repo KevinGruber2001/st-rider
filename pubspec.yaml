@@ -68,6 +68,9 @@ flutter:
   assets:
     - lib/assets/map_style.txt
     - lib/assets/st-logo.png
+    - lib/assets/flag-icon.png
+    - lib/assets/origin-icon.png
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

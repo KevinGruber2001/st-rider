@@ -21,12 +21,6 @@ class PlacesRepo {
       'key': googleApiKey,
     });
 
-    log("test");
-    print(response);
-
-    print(response.data["candidates"]);
-    log("hallo");
-
     if (response.statusCode == 200) {
       List<Place> places = List<Place>.from(
           response.data["candidates"].map((model) => Place.fromMap(model)));

@@ -7,9 +7,18 @@ class Driver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text("Your Driver is arriving at:"),
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Your driver is arriving"),
+            SizedBox(
+              height: 20,
+            ),
+            Text("12:34")
+          ],
+        ),
       ),
     );
   }

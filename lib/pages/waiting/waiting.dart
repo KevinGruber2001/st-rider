@@ -32,6 +32,14 @@ class _WaitingState extends State<Waiting> {
   }
 
   checkIfDriverAccepts() async {
+    if (checkCounter > 20) {
+      setState(() {
+        disposed = true;
+      });
+      await AssignmentRepo().cancelRequest();
+      Navigator.of(context).pop();
+    }
+
     while (!driverAccepted && !disposed) {
       bool temp = await AssignmentRepo().fetchAssignment();
       log("temp");
@@ -61,8 +69,20 @@ class _WaitingState extends State<Waiting> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Waiting for drivers to accept. Counter = " +
-                checkCounter.toString()),
+            Container(
+              height: 70,
+              width: 70,
+              child: CircularProgressIndicator(
+                strokeWidth: 7,
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text("Waiting for drivers to accept."),
+            SizedBox(
+              height: 20,
+            ),
             ElevatedButton(
               onPressed: () async {
                 setState(() {
