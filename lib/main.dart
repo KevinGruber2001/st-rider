@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sixt Together',
       theme: themeData,
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
