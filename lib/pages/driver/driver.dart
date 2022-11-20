@@ -16,7 +16,7 @@ class Driver extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            Text("12:34")
+            Text(style: TextStyle(fontSize: 30), "SOON")
           ],
         ),
       ),

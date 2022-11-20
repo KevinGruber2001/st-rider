@@ -30,6 +30,12 @@ class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
   bool showMap = true;
 
+  @override
+  void initState() {
+    super.initState();
+    AssignmentRepo().authenticate();
+  }
+
   closeMap() {
     setState(() {
       showMap = false;
@@ -144,6 +150,18 @@ class _HomePageState extends State<HomePage> {
                             place.location.latitude, place.location.longitude),
                       );
                     });
+
+                    if (destination != null && origin != null) {
+                      Directions? directions = await DirectionsRepo()
+                          .getDirections(
+                              origin!.position, destination!.position);
+
+                      if (directions != null) {
+                        setState(() {
+                          route = directions;
+                        });
+                      }
+                    }
                   },
                 ),
                 SizedBox(

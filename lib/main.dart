@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rider/assets/theme.dart';
 import 'package:rider/pages/home/home.dart';
+import 'package:rider/repo/assignment_repo.dart';
 
 void main() {
   runApp(const MyApp());

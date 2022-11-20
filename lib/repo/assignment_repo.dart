@@ -14,15 +14,15 @@ class AssignmentRepo {
   AssignmentRepo({Dio? dio}) : _dio = dio ?? Dio();
 
   Future<String> authenticate() async {
-    if (token != null) return Future.value(token as String);
-
     final response = await _dio.get(_baseUrl + '/authenticate');
     token = response.data;
     return response.data as String;
   }
 
   Future<void> registerRequest(LatLng origin, LatLng destination) async {
-    String authToken = await authenticate();
+    String authToken = token as String;
+    log("auth token test1");
+    log(authToken);
 
     final response = await _dio.post(
       _baseUrl + '/rider/registerRequest',
@@ -38,7 +38,9 @@ class AssignmentRepo {
   }
 
   Future<void> cancelRequest() async {
-    String authToken = await authenticate();
+    String authToken = token as String;
+    log("auth token test2");
+    log(authToken);
 
     final response = await _dio.post(_baseUrl + '/rider/cancelRequest',
         data: jsonEncode(<String, dynamic>{
@@ -47,7 +49,9 @@ class AssignmentRepo {
   }
 
   Future<bool> fetchAssignment() async {
-    String authToken = await authenticate();
+    String authToken = token as String;
+    log("auth token test3");
+    log(authToken);
 
     final response = await _dio.post(_baseUrl + '/rider/fetchAssignment',
         data: jsonEncode(<String, dynamic>{
